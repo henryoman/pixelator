@@ -1,0 +1,14 @@
+# Pixelization settings
+grid_size: 32       # Size of the pixel grid (8, 16, 32, or 64)
+pixel_size: 20      # Upscale factor for crisp display
+palette_name: "Flying Tiger"  # Must match a key in colors.yaml
+
+# Processing options
+auto_square: true   # Automatically crop images to square format
+quality: "high"     # Output quality: "low", "medium", "high"
+format: "png"       # Output format: "png", "jpg"
+
+# Advanced settings
+color_matching: "lab"  # Color space for palette matching: "rgb", "lab", "hsv"
+dithering: false       # Apply dithering for smoother gradients
+preserve_transparency: true  # Keep transparent areas in PNG files

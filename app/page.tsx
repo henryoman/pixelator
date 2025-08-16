@@ -2,106 +2,60 @@
 
 import type React from "react"
 
-import { useState, useRef } from "react"
+import { useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Upload, Download, Palette, Settings, ChevronDown } from "lucide-react"
-import { pixelizeImage, DEFAULT_PALETTES, ALGORITHMS } from "@/lib/pixelization"
+import { Palette, Settings } from "lucide-react"
+import { ALGORITHMS } from "@/lib/algorithms"
+import { PALETTES } from "@/config/palettes"
+import {
+  ImageUploader,
+  PalettePicker,
+  GridSizeSelector,
+  AlgorithmSelector,
+  OutputPreview,
+  DownloadButtons,
+  usePixelization,
+} from "@/features/pixelization"
 
 export default function PixelizationTool() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
-  const [pixelizedImage, setPixelizedImage] = useState<string | null>(null)
-  const [baseResolutionImage, setBaseResolutionImage] = useState<string | null>(null)
   const [gridSize, setGridSize] = useState<number>(32)
   const [selectedPalette, setSelectedPalette] = useState<string>("Flying Tiger")
   const [algorithm, setAlgorithm] = useState<string>("Standard")
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [paletteDropdownOpen, setPaletteDropdownOpen] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const paletteButtonRef = useRef<HTMLButtonElement>(null)
+  const { isProcessing, pixelizedImage, baseResolutionImage, processImage } = usePixelization()
 
-  const gridSizes = [
-    { value: 8, label: "8×8" },
-    { value: 16, label: "16×16" },
-    { value: 32, label: "32×32" },
-    { value: 64, label: "64×64" },
-    { value: 80, label: "80×80" },
-    { value: 96, label: "96×96" },
-    { value: 128, label: "128×128" },
-    { value: 192, label: "192×192" },
-    { value: 256, label: "256×256" },
-    { value: 288, label: "288×288" },
-    { value: 384, label: "384×384" },
-    { value: 512, label: "512×512" },
-  ]
+  const gridSizes = useMemo(
+    () => [
+      { value: 8, label: "8×8" },
+      { value: 16, label: "16×16" },
+      { value: 32, label: "32×32" },
+      { value: 64, label: "64×64" },
+      { value: 80, label: "80×80" },
+      { value: 96, label: "96×96" },
+      { value: 128, label: "128×128" },
+      { value: 192, label: "192×192" },
+      { value: 256, label: "256×256" },
+      { value: 288, label: "288×288" },
+      { value: 384, label: "384×384" },
+      { value: 512, label: "512×512" },
+    ],
+    [],
+  )
 
-  const palettes = DEFAULT_PALETTES
+  const palettes = PALETTES
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        setSelectedImage(e.target?.result as string)
-        setPixelizedImage(null)
-        setBaseResolutionImage(null)
-      }
-      reader.readAsDataURL(file)
-    }
-  }
-
-  const processImage = async () => {
+  const processCurrent = () => {
     if (!selectedImage) return
-
-    setIsProcessing(true)
-    try {
-      const palette = palettes.find((p) => p.name === selectedPalette) || palettes[0]
-      const result = await pixelizeImage(
-        selectedImage,
-        {
-          gridSize,
-          pixelSize: 1,
-          palette,
-        },
-        algorithm,
-      )
-      setPixelizedImage(result)
-      const baseResult = await pixelizeImage(
-        selectedImage,
-        {
-          gridSize,
-          pixelSize: 1,
-          palette,
-          noUpscale: true,
-        },
-        algorithm,
-      )
-      setBaseResolutionImage(baseResult)
-    } catch (error) {
-      console.error("Pixelization failed:", error)
-      setPixelizedImage(selectedImage)
-      setBaseResolutionImage(selectedImage)
-    } finally {
-      setIsProcessing(false)
+    if (palettes.length === 0) return
+    const found = palettes.find((p) => p.name === selectedPalette)
+    if (found) {
+      processImage(selectedImage, { gridSize, palette: found }, algorithm)
+      return
     }
-  }
-
-  const downloadImage = () => {
-    if (!pixelizedImage) return
-
-    const link = document.createElement("a")
-    link.download = `pixelized-${algorithm.toLowerCase()}-${gridSize}x${gridSize}-${selectedPalette.toLowerCase().replace(/\s+/g, "-")}.png`
-    link.href = pixelizedImage
-    link.click()
-  }
-
-  const downloadBaseResolution = () => {
-    if (!baseResolutionImage) return
-
-    const link = document.createElement("a")
-    link.download = `pixelized-base-${algorithm.toLowerCase()}-${gridSize}x${gridSize}-${selectedPalette.toLowerCase().replace(/\s+/g, "-")}.png`
-    link.href = baseResolutionImage
-    link.click()
+    const first = palettes[0]
+    if (!first) return
+    processImage(selectedImage, { gridSize, palette: first }, algorithm)
   }
 
   return (
@@ -145,146 +99,31 @@ export default function PixelizationTool() {
             <Card className="border-border/50">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <Upload className="w-3 h-3 text-muted-foreground" />
+                  <Palette className="w-3 h-3 text-muted-foreground" />
                   <h3 className="text-sm font-medium">Source Image</h3>
                 </div>
-                <div
-                  className="border-2 border-dashed border-border/50 rounded-lg p-6 text-center cursor-pointer hover:border-border transition-colors"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  {selectedImage ? (
-                    <div className="space-y-2">
-                      <img
-                        src={selectedImage || "/placeholder.svg"}
-                        alt="Selected"
-                        className="w-20 h-20 object-cover rounded-md mx-auto"
-                      />
-                      <p className="text-xs text-muted-foreground">Click to change</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <Upload className="w-6 h-6 text-muted-foreground mx-auto" />
-                      <div>
-                        <p className="text-sm font-medium">Drop image here</p>
-                        <p className="text-xs text-muted-foreground">PNG, JPG up to 10MB</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
+                <ImageUploader value={selectedImage} onChange={setSelectedImage} />
               </CardContent>
             </Card>
 
             <Card className="border-border/50">
               <CardContent className="p-4">
                 <h3 className="text-sm font-medium mb-3">Color Palette</h3>
-                <div className="relative">
-                  <button
-                    ref={paletteButtonRef}
-                    onClick={() => setPaletteDropdownOpen(!paletteDropdownOpen)}
-                    className="w-full p-3 rounded-md border border-border/50 hover:border-border transition-colors flex items-center justify-between"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">{selectedPalette}</span>
-                      <div className="flex gap-1">
-                        {palettes
-                          .find((p) => p.name === selectedPalette)
-                          ?.colors.slice(0, 6)
-                          .map((color, index) => (
-                            <div
-                              key={index}
-                              className="w-3 h-3 rounded-sm border border-border/30"
-                              style={{ backgroundColor: color }}
-                            />
-                          ))}
-                      </div>
-                    </div>
-                    <ChevronDown
-                      className={`w-4 h-4 transition-transform ${paletteDropdownOpen ? "rotate-180" : ""}`}
-                    />
-                  </button>
-
-                  {paletteDropdownOpen && (
-                    <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-border/50 rounded-md shadow-lg z-[100] max-h-60 overflow-y-auto">
-                      {palettes.map((palette) => (
-                        <button
-                          key={palette.name}
-                          onClick={() => {
-                            setSelectedPalette(palette.name)
-                            setPaletteDropdownOpen(false)
-                          }}
-                          className={`w-full p-3 text-left hover:bg-muted/50 transition-colors border-b border-border/30 last:border-b-0 ${
-                            selectedPalette === palette.name ? "bg-muted/50" : ""
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium">{palette.name}</span>
-                            <div className="flex gap-1">
-                              {palette.colors.slice(0, 8).map((color, index) => (
-                                <div
-                                  key={index}
-                                  className="w-2 h-2 rounded-sm border border-border/30"
-                                  style={{ backgroundColor: color }}
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <PalettePicker palettes={palettes} value={selectedPalette} onChange={setSelectedPalette} />
               </CardContent>
             </Card>
 
             <Card className="border-border/50">
               <CardContent className="p-4">
                 <h3 className="text-sm font-medium mb-3">Grid Resolution</h3>
-                <div className="grid grid-cols-4 gap-2">
-                  {gridSizes.map((size) => (
-                    <button
-                      key={size.value}
-                      onClick={() => setGridSize(size.value)}
-                      className={`p-2 rounded-md border text-xs font-medium transition-colors ${
-                        gridSize === size.value
-                          ? "border-foreground bg-foreground text-background"
-                          : "border-border/50 hover:border-border"
-                      }`}
-                    >
-                      {size.label}
-                    </button>
-                  ))}
-                </div>
+                <GridSizeSelector options={gridSizes} value={gridSize} onChange={setGridSize} />
               </CardContent>
             </Card>
 
             <Card className="border-border/50">
               <CardContent className="p-4">
                 <h3 className="text-sm font-medium mb-3">Algorithm</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {ALGORITHMS.map((algo) => (
-                    <button
-                      key={algo.name}
-                      onClick={() => setAlgorithm(algo.name)}
-                      className={`p-2 rounded-md border text-xs font-medium transition-colors ${
-                        algorithm === algo.name
-                          ? "border-foreground bg-foreground text-background"
-                          : "border-border/50 hover:border-border"
-                      }`}
-                    >
-                      {algo.name}
-                    </button>
-                  ))}
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  {ALGORITHMS.find((a) => a.name === algorithm)?.description || "Select an algorithm"}
-                </p>
+                <AlgorithmSelector algorithms={ALGORITHMS} value={algorithm} onChange={setAlgorithm} />
               </CardContent>
             </Card>
           </div>
@@ -294,37 +133,12 @@ export default function PixelizationTool() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-medium">Output</h3>
-                  {pixelizedImage && (
-                    <Button variant="outline" size="sm" onClick={downloadImage}>
-                      <Download className="w-3 h-3 mr-2" />
-                      Export
-                    </Button>
-                  )}
                 </div>
-                <div className="w-full h-[640px] bg-muted/30 flex items-center justify-center border border-border/30">
-                  {pixelizedImage ? (
-                    <img
-                      src={pixelizedImage || "/placeholder.svg"}
-                      alt="Pixelized result"
-                      className="max-w-full max-h-full object-contain"
-                      style={{ imageRendering: "pixelated" }}
-                    />
-                  ) : selectedImage ? (
-                    <div className="text-center space-y-2">
-                      <Palette className="w-6 h-6 text-muted-foreground mx-auto" />
-                      <p className="text-xs text-muted-foreground">Ready to process</p>
-                    </div>
-                  ) : (
-                    <div className="text-center space-y-2">
-                      <div className="w-6 h-6 border-2 border-dashed border-muted-foreground/50 rounded mx-auto" />
-                      <p className="text-xs text-muted-foreground">Preview will appear here</p>
-                    </div>
-                  )}
-                </div>
+                <OutputPreview image={pixelizedImage} />
               </CardContent>
             </Card>
 
-            <Button onClick={processImage} disabled={!selectedImage || isProcessing} className="w-full h-10" size="lg">
+            <Button onClick={processCurrent} disabled={!selectedImage || isProcessing} className="w-full h-10" size="lg">
               {isProcessing ? (
                 <>
                   <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin mr-2" />
@@ -339,21 +153,13 @@ export default function PixelizationTool() {
               <Card className="border-border/50">
                 <CardContent className="p-4">
                   <h3 className="text-sm font-medium mb-3">Download Options</h3>
-                  <div className="space-y-2">
-                    <Button variant="outline" size="sm" onClick={downloadImage} className="w-full bg-transparent">
-                      <Download className="w-3 h-3 mr-2" />
-                      Download Preview (Upscaled)
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={downloadBaseResolution}
-                      className="w-full bg-transparent"
-                    >
-                      <Download className="w-3 h-3 mr-2" />
-                      Download Base Resolution ({gridSize}×{gridSize})
-                    </Button>
-                  </div>
+                  <DownloadButtons
+                    pixelizedImage={pixelizedImage}
+                    baseResolutionImage={baseResolutionImage}
+                    algorithm={algorithm}
+                    gridSize={gridSize}
+                    paletteName={selectedPalette}
+                  />
                 </CardContent>
               </Card>
             )}

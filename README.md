@@ -1,4 +1,4 @@
-![Bitcrush Logo](/bitcrush.png)
+![Bitcrush Logo](/public/bitcrush.png)
 
 # Bitcrush
 

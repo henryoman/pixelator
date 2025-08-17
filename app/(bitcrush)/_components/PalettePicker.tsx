@@ -13,8 +13,7 @@ interface PalettePickerProps {
 export function PalettePicker({ palettes, value, onChange }: PalettePickerProps) {
   const [open, setOpen] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
-  const selected =
-    palettes.find((p) => p.name === value) ?? palettes[0] ?? { name: "Default", colors: [] }
+  const selected = palettes.find((p) => p.name === value) ?? palettes[0] ?? { name: "Default", colors: [] }
 
   return (
     <div className="relative">

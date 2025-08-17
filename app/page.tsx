@@ -8,22 +8,20 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Palette, Settings } from "lucide-react"
 import { ALGORITHMS } from "@/lib/algorithms"
 import { PALETTES } from "@/config/palettes"
-import {
-  ImageUploader,
-  PalettePicker,
-  GridSizeSelector,
-  AlgorithmSelector,
-  OutputPreview,
-  DownloadButtons,
-  usePixelization,
-} from "@/features/pixelization"
+import { ImageUploader } from "@/app/(bitcrush)/_components/ImageUploader"
+import { PalettePicker } from "@/app/(bitcrush)/_components/PalettePicker"
+import { GridSizeSelector } from "@/app/(bitcrush)/_components/GridSizeSelector"
+import { AlgorithmSelector } from "@/app/(bitcrush)/_components/AlgorithmSelector"
+import { OutputPreview } from "@/app/(bitcrush)/_components/OutputPreview"
+import { DownloadButtons } from "@/app/(bitcrush)/_components/DownloadButtons"
+import { usePixelization } from "@/app/(bitcrush)/_hooks/usePixelization"
 
 export default function PixelizationTool() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [gridSize, setGridSize] = useState<number>(32)
   const [selectedPalette, setSelectedPalette] = useState<string>("Flying Tiger")
   const [algorithm, setAlgorithm] = useState<string>("Standard")
-  const { isProcessing, pixelizedImage, baseResolutionImage, processImage, extraPalettes } = usePixelization()
+  const { isProcessing, pixelizedImage, baseResolutionImage, processImage } = usePixelization()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -48,7 +46,7 @@ export default function PixelizationTool() {
     [],
   )
 
-  const palettes = extraPalettes && extraPalettes.length > 0 ? [...PALETTES, ...extraPalettes] : PALETTES
+  const palettes = PALETTES
 
   const processCurrent = () => {
     if (!selectedImage) return

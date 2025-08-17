@@ -29,5 +29,3 @@ export function usePixelization() {
 
   return { isProcessing, pixelizedImage, baseResolutionImage, error, processImage }
 }
-
-

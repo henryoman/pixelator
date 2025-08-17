@@ -1,22 +1,33 @@
 "use client"
 
+import Image from "next/image"
+
 interface OutputPreviewProps {
   image: string | null
 }
 
 export function OutputPreview({ image }: OutputPreviewProps) {
   return (
-    <div className="w-full h-[640px] bg-muted/30 flex items-center justify-center border border-border/30">
+    <div className="relative w-full h-[640px] bg-muted/30 border border-border/30">
       {image ? (
-        <img src={image || "/placeholder.svg"} alt="Pixelized result" className="max-w-full max-h-full object-contain" style={{ imageRendering: "pixelated" }} />
+        <Image
+          src={image || "/placeholder.svg"}
+          alt="Pixelized result"
+          fill
+          sizes="100vw"
+          className="object-contain"
+          style={{ imageRendering: "pixelated" }}
+          unoptimized
+        />
       ) : (
-        <div className="text-center space-y-2">
-          <div className="w-6 h-6 border-2 border-dashed border-muted-foreground/50 rounded mx-auto" />
-          <p className="text-xs text-muted-foreground">Preview will appear here</p>
+        <div className="absolute inset-0 flex items-center justify-center text-center space-y-2">
+          <div>
+            <div className="w-6 h-6 border-2 border-dashed border-muted-foreground/50 rounded mx-auto" />
+            <p className="text-xs text-muted-foreground mt-2">Preview will appear here</p>
+          </div>
         </div>
       )}
     </div>
   )
 }
-
 

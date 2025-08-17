@@ -1,30 +1,13 @@
-# Pixelization landing page
+![Bitcrush Logo](/bitcrush.png)
 
-*Automatically synced with your [v0.app](https://v0.app) deployments*
+# Bitcrush
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/henry-omans-projects/v0-pixelization-landing-page)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/projects/eByKgnu7N0i)
+Turn images into crisp pixel art with selectable palettes and algorithms. This repo contains the Next.js UI only; the pixel engine will be migrated to Rust.
 
-## Overview
+## Development
 
-This repository will stay in sync with your deployed chats on [v0.app](https://v0.app).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.app](https://v0.app).
+- Install deps: `bun install`
+- Dev server: `bunx next dev`
+- Build: `bunx next build`
 
-## Deployment
 
-Your project is live at:
-
-**[https://vercel.com/henry-omans-projects/v0-pixelization-landing-page](https://vercel.com/henry-omans-projects/v0-pixelization-landing-page)**
-
-## Build your app
-
-Continue building your app on:
-
-**[https://v0.app/chat/projects/eByKgnu7N0i](https://v0.app/chat/projects/eByKgnu7N0i)**
-
-## How It Works
-
-1. Create and modify your project using [v0.app](https://v0.app)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository

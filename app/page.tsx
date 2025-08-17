@@ -5,7 +5,7 @@ import type React from "react"
 import { useEffect, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Palette, Settings } from "lucide-react"
+import Image from "next/image"
 import { ALGORITHMS } from "@/lib/algorithms"
 import { PALETTES } from "@/config/palettes"
 import { ImageUploader } from "@/app/(bitcrush)/_components/ImageUploader"
@@ -91,16 +91,10 @@ export default function PixelizationTool() {
       )}
 
       <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 bg-foreground rounded-md flex items-center justify-center">
-              <Palette className="w-3 h-3 text-background" />
-            </div>
-            <h1 className="text-base font-medium text-foreground">Pixelization Tool</h1>
+        <div className="container mx-auto px-6 py-3 flex items-center">
+          <div className="relative h-6" style={{ width: "auto" }}>
+            <Image src="/bitcrush.png" alt="Bitcrush" width={96} height={24} priority unoptimized />
           </div>
-          <Button variant="ghost" size="sm">
-            <Settings className="w-4 h-4" />
-          </Button>
         </div>
       </header>
 
@@ -110,7 +104,6 @@ export default function PixelizationTool() {
             <Card className="border-border/50">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <Palette className="w-3 h-3 text-muted-foreground" />
                   <h3 className="text-sm font-medium">Source Image</h3>
                 </div>
                 <ImageUploader value={selectedImage} onChange={setSelectedImage} />

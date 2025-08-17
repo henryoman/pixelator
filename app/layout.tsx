@@ -17,8 +17,8 @@ const openSans = Open_Sans({
 })
 
 export const metadata: Metadata = {
-  title: "PixelCraft - Transform Photos into Pixel Art",
-  description: "Turn your photos into beautiful retro pixel art with our easy-to-use pixelization tool",
+  title: "Bitcrush",
+  description: "Bitcrush — Pixel art generator UI",
   generator: "v0.app",
 }
 

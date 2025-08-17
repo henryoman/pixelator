@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useRef } from "react"
 import { Upload } from "lucide-react"
 
@@ -30,7 +31,16 @@ export function ImageUploader({ value, onChange }: ImageUploaderProps) {
       >
         {value ? (
           <div className="space-y-2">
-            <img src={value || "/placeholder.svg"} alt="Selected" className="w-20 h-20 object-cover rounded-md mx-auto" />
+            <div className="relative w-20 h-20 mx-auto">
+              <Image
+                src={value || "/placeholder.svg"}
+                alt="Selected"
+                fill
+                sizes="80px"
+                className="object-cover rounded-md"
+                unoptimized
+              />
+            </div>
             <p className="text-xs text-muted-foreground">Click to change</p>
           </div>
         ) : (

@@ -60,5 +60,3 @@ export function PalettePicker({ palettes, value, onChange }: PalettePickerProps)
     </div>
   )
 }
-
-

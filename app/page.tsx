@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Palette, Settings } from "lucide-react"
@@ -23,7 +23,12 @@ export default function PixelizationTool() {
   const [gridSize, setGridSize] = useState<number>(32)
   const [selectedPalette, setSelectedPalette] = useState<string>("Flying Tiger")
   const [algorithm, setAlgorithm] = useState<string>("Standard")
-  const { isProcessing, pixelizedImage, baseResolutionImage, processImage } = usePixelization()
+  const { isProcessing, pixelizedImage, baseResolutionImage, processImage, extraPalettes } = usePixelization()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const gridSizes = useMemo(
     () => [
@@ -43,7 +48,7 @@ export default function PixelizationTool() {
     [],
   )
 
-  const palettes = PALETTES
+  const palettes = extraPalettes && extraPalettes.length > 0 ? [...PALETTES, ...extraPalettes] : PALETTES
 
   const processCurrent = () => {
     if (!selectedImage) return
@@ -64,20 +69,28 @@ export default function PixelizationTool() {
         <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_24px,rgba(255,255,255,0.05)_25px,rgba(255,255,255,0.05)_26px,transparent_27px),linear-gradient(rgba(255,255,255,0.05)_24px,transparent_25px,transparent_26px,rgba(255,255,255,0.05)_27px)] bg-[length:25px_25px] animate-pulse" />
       </div>
 
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[...Array(12)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-2 h-2 bg-foreground/10 rounded-sm animate-bounce"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${3 + Math.random() * 2}s`,
-            }}
-          />
-        ))}
-      </div>
+      {mounted && (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {Array.from({ length: 12 }).map((_, i) => {
+            const left = ((i * 73) % 100) + (i % 2 === 0 ? 0.5 : 0)
+            const top = ((i * 37) % 100) + (i % 3 === 0 ? 0.25 : 0)
+            const delay = ((i * 487) % 3000) / 1000
+            const duration = 3 + (((i * 911) % 2000) / 1000)
+            return (
+              <div
+                key={i}
+                className="absolute w-2 h-2 bg-foreground/10 rounded-sm animate-bounce"
+                style={{
+                  left: `${left}%`,
+                  top: `${top}%`,
+                  animationDelay: `${delay}s`,
+                  animationDuration: `${duration}s`,
+                }}
+              />
+            )
+          })}
+        </div>
+      )}
 
       <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-6 py-3 flex items-center justify-between">

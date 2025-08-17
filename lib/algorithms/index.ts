@@ -1,17 +1,17 @@
-export { type PixelizationAlgorithm, type ColorPalette, type PixelizationParams } from "./types"
-export { standardAlgorithm } from "./standard"
-export { enhancedAlgorithm } from "./enhanced"
-export { artisticAlgorithm } from "./artistic"
-export { bayerAlgorithm } from "./bayer"
-export { floydSteinbergAlgorithm } from "./floyd-steinberg"
-export { dualColorDitheringAlgorithm } from "./dual-color-dithering"
-export { edgeDitheringAlgorithm } from "./edge-dithering"
-export { selectiveDitheringAlgorithm } from "./selective-dithering"
-export { orderedSelectiveDitheringAlgorithm } from "./ordered-selective"
-export { randomizedSelectiveDitheringAlgorithm } from "./randomized-selective"
-
 import type { PixelizationAlgorithm } from "./types"
-import {
+import { standardAlgorithm } from "./standard"
+import { enhancedAlgorithm } from "./enhanced"
+import { artisticAlgorithm } from "./artistic"
+import { bayerAlgorithm } from "./bayer"
+import { floydSteinbergAlgorithm } from "./floyd-steinberg"
+import { dualColorDitheringAlgorithm } from "./dual-color-dithering"
+import { edgeDitheringAlgorithm } from "./edge-dithering"
+import { selectiveDitheringAlgorithm } from "./selective-dithering"
+import { orderedSelectiveDitheringAlgorithm } from "./ordered-selective"
+import { randomizedSelectiveDitheringAlgorithm } from "./randomized-selective"
+
+export { type PixelizationAlgorithm, type ColorPalette, type PixelizationParams } from "./types"
+export {
   standardAlgorithm,
   enhancedAlgorithm,
   artisticAlgorithm,
@@ -22,7 +22,7 @@ import {
   selectiveDitheringAlgorithm,
   orderedSelectiveDitheringAlgorithm,
   randomizedSelectiveDitheringAlgorithm,
-} from "."
+}
 
 export const ALGORITHMS: PixelizationAlgorithm[] = [
   standardAlgorithm,

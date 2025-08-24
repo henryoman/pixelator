@@ -56,7 +56,7 @@ Parity scope is defined by the above. Visual equivalence is measured on base gri
 
 - Bun (run Vite and scripts), Vite 6, TS 5 for UI shell
 - Tauri 2 + Rust 1.7x
-- Rust crates: `image`, `rayon`, optional SIMD (`wide`), `tauri`
+- Rust crates: `image`, `rayon`, optional SIMD (`wide`), `tauri`, `serde`, `toml`
 
 ### Notes
 
@@ -84,14 +84,14 @@ bitcrush/
     # No TS palettes config; palettes come from Rust via IPC
 
   dist/                       # Vite build output (frontendDist)
-  config/
-    gpl-palettes/             # Drop .gpl files here; loaded at runtime
 
   src-tauri/
     capabilities/
       default.json            # Capabilities for main window
     resources/
-      palettes/               # External .gpl palettes (runtime loaded)
+      palettes/               # All palettes live here
+        gpl/                  # Drop .gpl files here
+        palettes.toml         # Additional palettes defined in TOML
     src/
       lib.rs                  # Tauri builder and commands
       main.rs                 # Entry, calls run()
@@ -100,7 +100,6 @@ bitcrush/
         algorithms/           # Ports of algorithms
         color.rs
         quant.rs
-        palettes.rs           # Core embedded palettes (const arrays)
         dither/
           floyd_steinberg.rs
           ordered.rs
@@ -190,8 +189,9 @@ cargo tauri build
 - Save image
   - Use Tauri `dialog` (save) to choose a path and `fs` to write PNG bytes.
 - Palettes
-  - Core (embedded): `src-tauri/src/engine/palettes.rs` const arrays
-  - External (user/extra): `.gpl` files under `src-tauri/resources/palettes/` loaded at runtime; `list_palettes` merges core + external
+  - `.gpl` files under `src-tauri/resources/palettes/gpl/` loaded at runtime
+  - `palettes.toml` under `src-tauri/resources/palettes/` for additional palettes
+  - `list_palettes` merges all sources and returns names + colors
 
 ---
 

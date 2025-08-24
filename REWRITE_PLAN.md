@@ -133,20 +133,6 @@ bun run dev           # Vite dev server on 1420 (HMR 1421)
 bun run build         # Vite build → dist/
 ```
 
-- Tauri 2 configuration (high level)
-  - devUrl: `http://localhost:1420` (Vite) with HMR at 1421 when TAURI_DEV_HOST set.
-  - beforeDevCommand: `bun run dev`
-  - beforeBuildCommand: `bun run build`
-  - frontendDist: `../dist`
-  - Capabilities: `capabilities/default.json` with `core:default`, `opener:default` (extend as needed).
-  - Permissions: enable only `dialog` and `fs` (read/write) when added.
-  - Rust commands: `load_image`, `render_preview`, `render_base`, `export_png`, `list_palettes`.
-
-- Tauri dev/build
-
-```bash
-cargo tauri dev
-cargo tauri build
 ```
 
 ---
